@@ -4,64 +4,88 @@ require('dotenv').config();
 const ObjectId = require('mongodb').ObjectId;
 const MongoUtil = require('./MongoUtil');
 
-// Three parts of an Express application
-
-// Setup
 const app = express();
-
-// enable JSON data processing
 app.use(express.json());
-
-// enable CORS 
 app.use(cors());
 
 const COLLECTION_ARTICLES = "beautyhacks"
 
 
-// add routes here
 async function main() {
     await MongoUtil.connect(process.env.MONGO_URI, "test_homemade");
 
+    // GET - welcome message
     app.get('/welcome', function (req, res) {
         res.json({
             'message': 'Welcome to my beauty hack !'
         })
     })
 
-    // test reading & search engine! 
-
+    // GET - view all articles in collection (checked)
     app.get('/articles', async function (req, res) {
-        // create citeria object (assumption: the user wants everything)
-        let criteria = {};
+        try {
+            const db = MongoUtil.getDB()
 
-        // query equals everything after ? --- example: ?title=honey&body_tags=eyes
-
-        // search for all titles where the field has the word "honey" using regex
-        if (req.query.title) {
-            criteria['title'] = {
-                '$regex': req.query.title, // whatever is in search box
-                '$options': 'i' // means ignore casing
-            }
-        }
-        
-
-        // finding in an array
-        if (req.query.body_tags) {
-            criteria['body_tags'] = {
-                '$in': [req.query.body_tags]
-            }
+            let allArticles = await db.collection(COLLECTION_ARTICLES).find().toArray();
+            res.json({
+                'article': allArticles
+            })
+        } catch (e) {
+            res.status(500);
+            res.json({
+                'message': "We are having technical issues, please be patient with us"
+            })
+            console.log(e);
         }
 
-        const db = MongoUtil.getDB();
-        // when using .find() needs a toArray()
-        // when using .findOne(), not required
-        let allArticles = await db.collection(COLLECTION_ARTICLES).find(criteria).toArray();
-        res.json({
-            'article': allArticles
-        })
     })
 
-    // test creating
+    // GET - search filter using criteria honey & face (checked)
+    // route as follows: /articles/search?title=honey&body_tags=face
+
+
+    app.get('/articles/search', async function (req, res) {
+        try {
+
+            // create citeria object (assumption: the user wants everything)
+            let criteria = {};
+
+            // query equals everything after ? --- example: ?title=honey&body_tags=eyes
+
+            // search for all titles where the field has the word "honey" using regex
+            if (req.query.title) {
+                criteria['title'] = {
+                    '$regex': req.query.title, // whatever is in search box
+                    '$options': 'i' // means ignore casing
+                }
+            }
+
+
+            // finding in an array
+            if (req.query.body_tags) {
+                criteria['body_tags'] = {
+                    '$in': [req.query.body_tags]
+                }
+            }
+
+            const db = MongoUtil.getDB();
+            // when using .find() needs a toArray()
+            // when using .findOne(), not required
+            let allArticles = await db.collection(COLLECTION_ARTICLES).find(criteria).toArray();
+            res.json({
+                'article': allArticles
+            })
+        } catch (e) {
+            res.status(500);
+            res.json({
+                'message': "There may be a problem with your system. Please contact tech support."
+            })
+            console.log(e);
+        }
+
+    })
+
+    // POST - user can add new article
 
     app.post('/article', async function (req, res) {
 
@@ -107,9 +131,11 @@ async function main() {
             console.log(e);
         }
     })
-    // updating a document aka edit 
+
+    // PUT - user update a document aka edit (checked)
     // note : similar method to creating a new article but using app.put & updateOne
     app.put('/article/:id', async (req, res) => {
+
         try {
             let title = req.body.title;
             // let image = req.body.image;
@@ -152,29 +178,177 @@ async function main() {
         }
     })
 
-    // delete something 
-    app.delete('article/:id', async function (req,res) {
-        try{
+    // DELETE - user delete an article (checked) 
+    // --- TBC --- 
+    app.delete('/article/:id', async function (req, res) {
+        try {
             await MongoUtil.getDB().collection(COLLECTION_ARTICLES).deleteOne({
-                'id': ObjectId(req.params.id)
+                '_id': ObjectId(req.params.id)
             })
             res.status(200);
             res.json({
-                'message' : 'Document has been deleted'
+                'message': 'Document has been deleted'
             })
-        } catch(e) {
+        } catch (e) {
             res.status(500);
             res.json({
                 'message': "Unable to delete documents"
             })
             console.log(e) // to check the actual error message
         }
-        
+
+    })
+
+    // GET - COMMENTS 
+    // show all user comments for one article (checked)
+
+    app.get('/article/:id/comments', async (req, res) => {
+
+        try {
+            let db = MongoUtil.getDB();
+            let results = await db.collection(COLLECTION_ARTICLES).find({
+                "_id": ObjectId(req.params.id)
+            }).project({
+                'comments': 1
+            }).toArray()
+
+            res.statusCode = 200
+            res.send(results)
+
+        } catch (e) {
+            res.statusCode = 500
+            res.send({
+                "Message": "Unable to get comments"
+            })
+        }
+    })
+
+    // POST - COMMENTS 
+    // user add in new comment (checked)
+
+    app.post('/article/:id/comments/create', async (req, res) => {
+        try {
+            let db = MongoUtil.getDB()
+
+            let {
+                username,
+                email,
+                text,
+            } = req.body
+
+            let results = await db.collection(COLLECTION_ARTICLES).updateOne({
+                '_id': ObjectId(req.params.id)
+            }, {
+                '$push': {
+                    'comments': {
+                        username,
+                        email,
+                        text,
+                        comment_date: new Date(),
+                    }
+                }
+            })
+            res.statusCode = 200
+            res.send(results)
+
+        } catch (e) {
+            res.statusCode = 500
+            res.send({
+                "Message": "Unable to insert comment"
+            });
+            console.log(e)
+        }
+
+    })
+
+    // PUT - COMMENTS 
+    // user can edit comment
+
+    app.put('/article/:id/comments/edit/:username', async (req, res) => {
+
+        try {
+            let db = MongoUtil.getDB()
+
+            let {
+                text,
+            } = req.body
+
+            let results = await db.collection(COLLECTION_ARTICLES).updateOne({
+                'comments': {
+                    '$elemMatch': {
+                        'username': req.params.username
+                    }
+                }
+            }, {
+                '$set': {
+                    'comments.$.text': text,
+                    'comments.$.comment_date': new Date(),
+                }
+            })
+
+            res.statusCode = 200
+            res.send({
+                'message': 'Comments Updated'
+            })
+
+        } catch (e) {
+
+            res.statusCode = 500
+            res.send({
+                "Message": "Unable to update comment"
+            });
+            console.log(e)
+        }
+    })
+
+    // DELETE - COMMENTS
+    // user can choose to delete a comment
+
+    app.delete('/article/:id/comments/:username', async (req, res) => {
+        try {
+            let db = MongoUtil.getDB();
+
+            // find article that has the comment to be deleted
+            let toDelete = await db.collection(COLLECTION_ARTICLES).findOne({
+                '_id': ObjectId(req.params.id),
+            })
+
+            if (toDelete) {
+                let clone = []
+                if (toDelete.comments.length > 1) {
+                    let oldComment = toDelete.comments;
+                    let indexToDelete = oldComment.findIndex((c) => {
+                        return c.username == req.params.username;
+                    });
+
+                    clone = [
+                        ...oldComment.slice(0, indexToDelete),
+                        ...oldComment.slice(indexToDelete + 1)
+                    ];
+                }
+
+                let results = await db.collection(COLLECTION_ARTICLES).updateOne({
+                    '_id': ObjectId(req.params.id)
+                }, {
+                    $set: {
+                        "comments": clone
+                    }
+                })
+
+                res.statusCode = 200
+                res.send(results)
+            }
+        } catch (e) {
+            res.statusCode = 500
+            res.send({
+                "Message": "Unable to delete comment"
+            })
+        }
     })
 }
 
 main();
 
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3001, () => {
     console.log("Server has started")
 })

@@ -34,13 +34,13 @@ const { ObjectId } = require("mongodb")
                 "username" : "misterblach",
                 "email" : "",
                 "text" : "why so difficult",
-                "timestamp" : "timestamp", // time?
+                "comment_date" : new Date(), 
             },
             {
                 "username" : "mistress woman",
                 "email" : "",
                 "text" : "such awesome",
-                "timestamp" : "timestamp", // time?
+                "comment_date" : new Date(), 
             }
         ]
         
