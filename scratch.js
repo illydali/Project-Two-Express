@@ -149,3 +149,35 @@ const { ObjectId } = require("mongodb")
 //     "article_id": ObjectID()
 //     "user_id": integer
 // }
+
+db.beautyhacks.insertOne = ({
+    "title" : "Egg White Acne Mask",
+    "image" : "eggs.jpg",
+    "date" : new Date(),
+    "body_tags" : ["face"],
+    "ingredients" : [{
+        "_id" : ObjectId("62396212a2fdf6b678f3ddc4"),
+        "quantity" : "1 egg"
+    },
+    {
+        "_id" : ObjectId("62396246a2fdf6b678f3ddc5"),
+        "quantity" : "1 cup of warm water"
+    }],
+    "difficulty" : 2,
+    "duration" : 10,
+    "instructions" : {
+        1: "Separate egg whites from the yolk and place egg whites in a bowl",
+        2: "Dip a cotton swab into the bowl and dab the egg whites over your face",
+        3: "Let the mask sit for 10 mins",
+        4: "Wash off with a damp cloth"
+    },
+    "skin_concern" : [
+         ObjectId("62396f5051aece3932dcc542")
+    ],
+    "comments" : [{
+        "username": "lil wayne",
+        "email" : "kingofthehill@singrap.com",
+        "text" : " i really need this",
+        "comment_date" : new Date()
+    }]
+})
