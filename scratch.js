@@ -1,14 +1,15 @@
+const { ObjectID } = require("bson")
 const { ObjectId } = require("mongodb")
 
 // sample document
 "beautyhacks" = [
     {
         "_id": ObjectId,
-        "article_id": 001,
+        // "article_id": 001,
         "title": "Hydrating Coconut Oil and Honey Mask",
-        "image" : "url",
-        "post_date": yyyy-mm-dd,
-        "bpdy_tags": ["eyes", "nose"],
+        "image" : "cocooil_honey.jpg",
+        "date": yyyy-mm-dd,
+        "body_tags": ["face", "neck", "chest"],
         "ingredients": [
             {
                 "_id": ObjectId,
@@ -16,18 +17,18 @@ const { ObjectId } = require("mongodb")
             },
             {
                 "_id": ObjectId,
-                "quantity" : "2 drops"
+                "quantity" : "1 tsp"
             }
         ],
         "difficulty": 1, // 1-5
-        "duration" : 10, // for $gte $lte search
+        "duration" : 15, // for $gte $lte search
         "instructions": {
-            1: "mix ingredients together",
-            2: "spoon onto your face",
-            3: "leave on for 10 mins",
-            4: "wash face and pat dry",
+            1: "Mix coconut oil and honey until combined",
+            2: "Apply to freshly cleansed skin in an even layer",
+            3: "Leave the mask on for 15 minutes",
+            4: "Rinse with warm water and pat dry",
         },
-        "skin_concern" : "dry",
+        "skin_concern" : [ObjectId, ObjectID], // (type) dry / sensitive
         "comments" : [
             {
                 "username" : "misterblach",
@@ -50,58 +51,62 @@ const { ObjectId } = require("mongodb")
 "ingredients" = [
     {
         "_id": ObjectId,
-        "type" : "coconut oil",
+        "name" : "coconut oil",
         "benefit" : "antibacterial and antifungal properties",
     },
     {
         "_id": ObjectId,
-        "type": "honey",
+        "name": "honey",
+        "benefit" : "helps to deeply penetrate the skin, soften the skin layers and work to remove impurities from pores including dirt that causes blackheads",
+    },
+    {
+        "_id": ObjectId,
+        "name": "tumeric",
         "benefit" : "",
     },
     {
         "_id": ObjectId,
-        "type": "tumeric",
-        "benefit" : "",
-    },
-    {
-        "_id": ObjectId,
-        "type" : "egg whites",
+        "name" : "egg whites",
         "benefit" : "natural antibacterial that helps prevents clogged pores",
     },
     {
         "_id": ObjectId,
-        "type" : "lemon",
+        "name" : "lemon",
         "benefit" : "",
     },
     {
         "_id": ObjectId,
-        "type" : "avocado",
+        "name" : "avocado",
         "benefit" : "",
     },
     {
         "_id": ObjectId,
-        "type" : "baking soda",
-        "benefit" : `contains anti-inflammatory and antibacterial qualities that aid in the 
-                    treatment of greasy skin. It is a natural, gentle abrasive that will gently 
-                    exfoliate your skin while absorbing excess oil and impurities that are buried in the skin,`
+        "name" : "baking soda",
+        "benefit" : 'a natural, gentle abrasive that exfoliates your skin while absorbing excess oil and impurities that are buried'
+
 
     }
 ]
 
 "skin_concern" = [
     {   
-        "_id": ObjectId,
-        "skin_type" : "dry",
+        "_id": "62396886a2fdf6b678f3ddcb",
+        "type" : "dry",
         "article_id" : [ObjectId, ObjectId]
     },
     {
         "_id": ObjectId,
-        "skin_type" : "oily",
+        "type" : "oily",
         "article_id" : ObjectId,
     },
     {
         "_id": ObjectId,
-        "skin_type" : "combi",
+        "type" : "sensitive",
+        "article_id" : ObjectId
+    },
+    {
+        "_id": ObjectId,
+        "type" : "acne",
         "article_id" : ObjectId
     }
 ]
@@ -112,9 +117,9 @@ const { ObjectId } = require("mongodb")
 
 // {       
 //         "title": string,
-//         "image_url" : string,
+//         "image" : string,
 //         "post_date": string,
-//         "body_part_tags": array of strings,
+//         "body_tags": array of strings,
 //         "ingredients": [
 //             {
 //                 "ingredient_id": 100,

@@ -28,26 +28,33 @@ async function main() {
         })
     })
 
-    // test reading & search criterias
+    // test reading & search engine! 
 
     app.get('/articles', async function (req, res) {
         // create citeria object (assumption: the user wants everything)
         let criteria = {};
 
+        // query equals everything after ? --- example: ?title=honey&body_tags=eyes
+
+        // search for all titles where the field has the word "honey" using regex
         if (req.query.title) {
             criteria['title'] = {
-                '$regex': req.query.title,
-                '$options': 'i'
+                '$regex': req.query.title, // whatever is in search box
+                '$options': 'i' // means ignore casing
             }
         }
+        
 
-        if (req.query.ingredients) {
-            criteria['coconut oil'] = {
-                '$in': [req.query.ingredients]
+        // finding in an array
+        if (req.query.body_tags) {
+            criteria['body_tags'] = {
+                '$in': [req.query.body_tags]
             }
         }
 
         const db = MongoUtil.getDB();
+        // when using .find() needs a toArray()
+        // when using .findOne(), not required
         let allArticles = await db.collection(COLLECTION_ARTICLES).find(criteria).toArray();
         res.json({
             'article': allArticles
@@ -61,27 +68,31 @@ async function main() {
         try {
 
             let title = req.body.title;
-            let image_url = req.body.image_url;
-            let datetime = new Date(req.body.post_date);
-            let bodyparts_tag = req.body.bodyparts_tag.split(",");
+            let image = req.body.image;
+            let date = new Date(req.body.date); // format has to be "2022-03-06"
+            let body_tags = req.body.body_tags.split(",");
             let ingredients = req.body.ingredients;
             let difficulty = req.body.difficulty;
             let duration = req.body.duration;
             let instructions = req.body.instructions
+            let skin_concern = req.body.skin_concern
 
             // insert into mongo database
             const db = MongoUtil.getDB();
-            
+
 
             await db.collection(COLLECTION_ARTICLES).insertOne({
+
+                // if identical can just use a single variable name
                 'title': title,
-                'image_url': image_url,
-                'post_date': datetime,
-                'bodyparts_tag': bodyparts_tag,
-                'ingredients' : ingredients,
+                'image': image,
+                'date': date,
+                'body_tags': body_tags,
+                'ingredients': ingredients,
                 'difficulty': difficulty,
                 'duration': duration,
                 'instructions': instructions,
+                'skin_concern': skin_concern,
 
             });
             res.status(200);
@@ -95,6 +106,70 @@ async function main() {
             })
             console.log(e);
         }
+    })
+    // updating a document aka edit 
+    // note : similar method to creating a new article but using app.put & updateOne
+    app.put('/article/:id', async (req, res) => {
+        try {
+            let title = req.body.title;
+            // let image = req.body.image;
+            // let date = new Date(req.body.date)
+            // let body_tags = req.body.body_tags
+            // let ingredients = req.body.ingredients;
+            // let difficulty = req.body.difficulty;
+            // let duration = req.body.duration;
+            // let instructions = req.body.instructions
+            // let skin_concern = req.body.skin_concern
+
+            // body_tags = body_tags.split(",")
+            // date = new Date(date);
+
+            let results = await MongoUtil.getDB().collection(COLLECTION_ARTICLES).updateOne({
+                '_id': ObjectId(req.params.id)
+            }, {
+                '$set': {
+                    'title': title,
+                    // 'image': image,
+                    // 'date': date,
+                    // 'body_tags': body_tags,
+                    // 'ingredients': ingredients,
+                    // 'difficulty': difficulty,
+                    // 'duration': duration,
+                    // 'instructions': instructions,
+                    // 'skin_concern': skin_concern,
+                }
+            });
+            res.status(200);
+            res.json({
+                'message': 'Success'
+            })
+        } catch (e) {
+            res.status(500);
+            res.json({
+                'message': "Please come back later"
+            })
+            console.log(e) // to check the actual error message
+        }
+    })
+
+    // delete something 
+    app.delete('article/:id', async function (req,res) {
+        try{
+            await MongoUtil.getDB().collection(COLLECTION_ARTICLES).deleteOne({
+                'id': ObjectId(req.params.id)
+            })
+            res.status(200);
+            res.json({
+                'message' : 'Document has been deleted'
+            })
+        } catch(e) {
+            res.status(500);
+            res.json({
+                'message': "Unable to delete documents"
+            })
+            console.log(e) // to check the actual error message
+        }
+        
     })
 }
 
