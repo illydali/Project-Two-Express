@@ -22,6 +22,8 @@ async function main() {
     })
 
     // GET - view all articles in collection (checked)
+    // tested on API
+
     app.get('/articles', async function (req, res) {
         try {
             const db = MongoUtil.getDB()
@@ -43,6 +45,7 @@ async function main() {
     // GET - search filter using criteria honey & face (checked)
     // route as follows: /articles/search?title=honey&body_tags=face
 
+    // tested on API
 
     app.get('/articles/search', async function (req, res) {
         try {
@@ -50,7 +53,7 @@ async function main() {
             // create citeria object (assumption: the user wants everything)
             let criteria = {};
 
-            // query equals everything after ? --- example: ?title=honey&body_tags=eyes
+            // query equals everything after ? --- example: ?title=honey&body_tags=face
 
             // search for all titles where the field has the word "honey" using regex
             if (req.query.title) {
@@ -86,6 +89,7 @@ async function main() {
     })
 
     // POST - user can add new article
+    // tested on API
 
     app.post('/article', async function (req, res) {
 
@@ -94,7 +98,7 @@ async function main() {
             let title = req.body.title;
             let image = req.body.image;
             let date = new Date(req.body.date); // format has to be "2022-03-06"
-            let body_tags = req.body.body_tags.split(",");
+            let body_tags = req.body.body_tags.split(","); // tags shld be inserted as string separated by comma
             let ingredients = req.body.ingredients;
             let difficulty = req.body.difficulty;
             let duration = req.body.duration;
@@ -103,7 +107,6 @@ async function main() {
 
             // insert into mongo database
             const db = MongoUtil.getDB();
-
 
             await db.collection(COLLECTION_ARTICLES).insertOne({
 
@@ -134,6 +137,9 @@ async function main() {
 
     // PUT - user update a document aka edit (checked)
     // note : similar method to creating a new article but using app.put & updateOne
+
+    // tested on API : update title 
+    // TBC what else user is gonna be allowed to update
     app.put('/article/:id', async (req, res) => {
 
         try {
@@ -179,7 +185,8 @@ async function main() {
     })
 
     // DELETE - user delete an article (checked) 
-    // --- TBC --- 
+    // --- TBC --- if allowing user to delete an article
+    // tested on API 
     app.delete('/article/:id', async function (req, res) {
         try {
             await MongoUtil.getDB().collection(COLLECTION_ARTICLES).deleteOne({
@@ -201,6 +208,7 @@ async function main() {
 
     // GET - COMMENTS 
     // show all user comments for one article (checked)
+    // tested on API
 
     app.get('/article/:id/comments', async (req, res) => {
 
@@ -225,6 +233,7 @@ async function main() {
 
     // POST - COMMENTS 
     // user add in new comment (checked)
+    // tested on API
 
     app.post('/article/:id/comments/create', async (req, res) => {
         try {
@@ -263,6 +272,7 @@ async function main() {
 
     // PUT - COMMENTS 
     // user can edit comment
+    // tested on API
 
     app.put('/article/:id/comments/edit/:username', async (req, res) => {
 
@@ -303,6 +313,7 @@ async function main() {
 
     // DELETE - COMMENTS
     // user can choose to delete a comment
+    // tested on API
 
     app.delete('/article/:id/comments/:username', async (req, res) => {
         try {

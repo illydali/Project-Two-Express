@@ -2,7 +2,7 @@ db.beautyhacks.insertOne({
     'title' : 'Egg White Acne Mask',
     'image' : 'eggs.jpg',
     'date' : ISODate('2022-03-01'),
-    'body_tags' : ['face']
+    'body_tags' : ['face'], // need string
     'ingredients' : [
         {
         '_id' : ObjectId('62396212a2fdf6b678f3ddc4'),
