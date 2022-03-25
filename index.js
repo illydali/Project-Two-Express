@@ -17,7 +17,7 @@ async function main() {
     // GET - welcome message
     app.get('/welcome', function (req, res) {
         res.json({
-            'message': 'Welcome to my beauty hack !'
+            'message': 'Welcome to the Skin Lang. API!'
         })
     })
 
