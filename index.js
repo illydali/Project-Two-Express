@@ -70,11 +70,18 @@ async function main() {
                     '$in': [req.query.body_tags]
                 }
             }
-
             const db = MongoUtil.getDB();
             // when using .find() needs a toArray()
             // when using .findOne(), not required
             let allArticles = await db.collection(COLLECTION_ARTICLES).find(criteria).toArray();
+            if (allArticles.length == 0) {
+                return (
+                    res.status(300),
+                    res.json({
+                        'message': "No matches found"
+                    })
+                )
+            }
             res.json({
                 'article': allArticles
             })

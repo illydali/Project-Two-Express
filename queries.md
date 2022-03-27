@@ -15,12 +15,12 @@ db.beautyhacks.insertOne({
         ],
     'difficulty' : 2,
     'duration' : 10,
-    'instructions' : {
-        1: 'Separate egg whites from the yolk and place egg whites in a bowl',
-        2: 'Dip a cotton swab into the bowl and dab the egg whites over your face',
-        3: 'Let the mask sit for 10 mins',
-        4: 'Wash off with a damp cloth'
-    },
+    'instructions' : [
+        'Separate egg whites from the yolk and place egg whites in a bowl'],
+        ['Dip a cotton swab into the bowl and dab the egg whites over your face'],
+        ['Let the mask sit for 10 mins'],
+         ['Wash off with a damp cloth']
+    ],
     'skin_concern' : [
         ObjectId('62396f5051aece3932dcc542')
     ],
@@ -55,12 +55,12 @@ db.beautyhacks.insertOne({
         ],
         "difficulty": 1, // 1-5
         "duration" : 15, // for $gte $lte search
-        "instructions": {
-            1: "Mix coconut oil and honey until combined",
-            2: "Apply to freshly cleansed skin in an even layer",
-            3: "Leave the mask on for 15 minutes",
-            4: "Rinse with warm water and pat dry",
-        },
+        "instructions": [
+                "Mix coconut oil and honey until combined"],
+                ["Apply to freshly cleansed skin in an even layer"],
+                ["Leave the mask on for 15 minutes"],
+                ["Rinse with warm water and pat dry",
+        ],
         "skin_concern" : [ObjectId, ObjectID], // (type) dry / sensitive
         "comments" : [
             {
