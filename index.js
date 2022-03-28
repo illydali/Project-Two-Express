@@ -9,7 +9,8 @@ app.use(express.json());
 app.use(cors());
 
 const COLLECTION_ARTICLES = "beautyhacks"
-
+const COLLECTION_INGREDIENTS = "ingredients"
+const COLLECTION_SKIN ='skin_concern'
 
 async function main() {
     await MongoUtil.connect(process.env.MONGO_URI, "test_homemade");
@@ -21,6 +22,44 @@ async function main() {
         })
     })
 
+    app.get('/ingredients', async function (req, res) {
+        try {
+            const db = MongoUtil.getDB()
+
+            let allIngredients = await db.collection(COLLECTION_INGREDIENTS).find().toArray();
+
+
+            res.json({
+                'ingredients': allIngredients
+            })
+        } catch (e) {
+            res.status(500);
+            res.json({
+                'message' : 'Confirm something wrong here'
+            })
+            console.log(e)
+        }
+    })
+    
+    // skin_concern collection here -- TBC if needed later
+    app.get('/skin', async function (req, res) {
+        try {
+            const db = MongoUtil.getDB()
+
+            let allTypes = await db.collection(COLLECTION_SKIN).find().toArray();
+
+
+            res.json({
+                'skin_types': allTypes
+            })
+        } catch (e) {
+            res.status(500);
+            res.json({
+                'message' : 'Confirm something wrong here'
+            })
+            console.log(e)
+        }
+    })
     // GET - view all articles in collection (checked)
     // tested on API
 
@@ -37,7 +76,7 @@ async function main() {
             res.json({
                 'message': "We are having technical issues, please be patient with us"
             })
-            console.log(e);
+            // console.log(e);
         }
 
     })
