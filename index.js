@@ -144,14 +144,14 @@ async function main() {
             // when using .findOne(), not required
             let results = await db.collection(COLLECTION_ARTICLES)
                 .find(criteria).toArray();
-            // if (results.length == 0) {
-            //     return (
-            //         res.status(300),
-            //         res.json({
-            //             'message': "No matches found"
-            //         })
-            //     )
-            // }
+            if (results.length == 0) {
+                return (
+                    res.status(300),
+                    res.json({
+                        'message': "No matches found"
+                    })
+                )
+            }
             console.log(criteria)
             
             res.send(results)
