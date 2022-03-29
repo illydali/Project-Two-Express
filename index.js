@@ -10,7 +10,7 @@ app.use(cors());
 
 const COLLECTION_ARTICLES = "beautyhacks"
 const COLLECTION_INGREDIENTS = "ingredients"
-const COLLECTION_SKIN ='skin_concern'
+const COLLECTION_SKIN = 'skin_concern'
 
 async function main() {
     await MongoUtil.connect(process.env.MONGO_URI, "test_homemade");
@@ -35,12 +35,12 @@ async function main() {
         } catch (e) {
             res.status(500);
             res.json({
-                'message' : 'Confirm something wrong here'
+                'message': 'Confirm something wrong here'
             })
             console.log(e)
         }
     })
-    
+
     // skin_concern collection here -- TBC if needed later
     app.get('/skin', async function (req, res) {
         try {
@@ -55,7 +55,7 @@ async function main() {
         } catch (e) {
             res.status(500);
             res.json({
-                'message' : 'Confirm something wrong here'
+                'message': 'Confirm something wrong here'
             })
             console.log(e)
         }
@@ -89,8 +89,11 @@ async function main() {
     app.get('/articles/search', async function (req, res) {
         try {
 
-            // create citeria object (assumption: the user wants everything)
+            // create citeria object for title or description
             let criteria = {};
+            
+            // filter by duration and body tags
+            // let filterCriteria = {};
 
             // query equals everything after ? --- example: ?title=honey&body_tags=face
 
@@ -102,6 +105,12 @@ async function main() {
                 }
             }
 
+            if (req.query.description) {
+                criteria['description'] = {
+                    '$regex': req.query.description,
+                    '$options': 'i'
+                }
+            }
 
             // finding in an array
             if (req.query.body_tags) {
@@ -109,21 +118,44 @@ async function main() {
                     '$in': [req.query.body_tags]
                 }
             }
+
+            // selecting by duration
+            if (req.query.duration) {
+                if (req.query.duration == '10mins or less') {
+                    criteria['duration'] = {
+                        '$lte': 10
+                    }
+                }
+                if (req.query.duration == '10mins to 20mins') {
+                    criteria['duration'] = {
+                        '$lte': 20,
+                        '$gte': 10
+                    }
+                }
+                if (req.query.duration == '20mins and above') {
+                    criteria['duration'] = {
+                        '$gte': 20
+                    }
+                }
+            }
+
             const db = MongoUtil.getDB();
             // when using .find() needs a toArray()
             // when using .findOne(), not required
-            let allArticles = await db.collection(COLLECTION_ARTICLES).find(criteria).toArray();
-            if (allArticles.length == 0) {
-                return (
-                    res.status(300),
-                    res.json({
-                        'message': "No matches found"
-                    })
-                )
-            }
-            res.json({
-                'article': allArticles
-            })
+            let results = await db.collection(COLLECTION_ARTICLES)
+                .find(criteria).toArray();
+            // if (results.length == 0) {
+            //     return (
+            //         res.status(300),
+            //         res.json({
+            //             'message': "No matches found"
+            //         })
+            //     )
+            // }
+            console.log(criteria)
+            
+            res.send(results)
+            res.status(200)
         } catch (e) {
             res.status(500);
             res.json({
@@ -143,7 +175,8 @@ async function main() {
 
             let title = req.body.title;
             let image = req.body.image;
-            let date = new Date(req.body.date); // format has to be "2022-03-06"
+
+            let description = req.body.description;
             let body_tags = req.body.body_tags.split(","); // tags shld be inserted as string separated by comma
             let ingredients = req.body.ingredients;
             let difficulty = req.body.difficulty;
@@ -156,16 +189,16 @@ async function main() {
 
             await db.collection(COLLECTION_ARTICLES).insertOne({
 
-                // if identical can just use a single variable name
-                'title': title,
-                'image': image,
-                'date': date,
-                'body_tags': body_tags,
-                'ingredients': ingredients,
-                'difficulty': difficulty,
-                'duration': duration,
-                'instructions': instructions,
-                'skin_concern': skin_concern,
+                title,
+                image,
+                date: new Date(),
+                description,
+                body_tags,
+                ingredients,
+                difficulty,
+                duration,
+                instructions,
+                skin_concern,
 
             });
             res.status(200);
