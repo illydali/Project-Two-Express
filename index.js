@@ -91,7 +91,7 @@ async function main() {
 
             // create citeria object for title or description
             let criteria = {};
-            
+
             // filter by duration and body tags
             // let filterCriteria = {};
 
@@ -153,7 +153,7 @@ async function main() {
                 )
             }
             console.log(criteria)
-            
+
             res.send(results)
             res.status(200)
         } catch (e) {
@@ -179,8 +179,7 @@ async function main() {
             let description = req.body.description;
             let body_tags = req.body.body_tags // tags shld be inserted as string separated by comma
             let ingredients = req.body.ingredients // need to split
-            let quantity = req.body.ingredients.quantity;
-           
+
             let duration = req.body.duration;
             let instructions = req.body.instructions
             let skin_concern = req.body.skin_concern
@@ -195,53 +194,45 @@ async function main() {
             if (!image) {
                 testInfo += 1;
             }
-
             if (description.length < 5) {
                 testInfo += 1;
             }
-
-            if (body_tags < 4) {
+            if (!body_tags) {
                 testInfo += 1;
             }
-
             if (!ingredients) {
                 testInfo += 1;
             }
-
-            if (quantity.length < 3) {
-                testInfo += 1;
-            }
-
             if (!duration) {
                 testInfo += 1;
             }
-            
-            if (instructions.length < 4) {
+            if (!instructions) {
                 testInfo += 1;
             }
-
             if (!skin_concern) {
                 testInfo += 1
-            } 
-
+            }
             if (testInfo > 0) {
-                res.status(406)
-                res.json({
-                    'message' : 'Incomplete form'
+                return res.status(406).json({
+                    'message': 'incomplete'
                 })
             } else {
                 body_tags = body_tags.split(",")
+                // console.log(typeof body_tags)
                 body_tags = body_tags.map(each => {
-                    return each.body_tags.trim()
+                    return each.trim()
                 })
-                ingredients = ingredients.split(",")
-                ingredients = ingredients.map(each => {
-                    return each.ingredients.trim()
+                instructions = instructions.split(",")
+                instructions = instructions.map(each => {
+                    return each.trim()
                 })
-
+                ingredients = ingredients.map((each) => {
+                    return {
+                        name: each.name,
+                        quantity: each.quantity
+                    }
+                })
             }
-
-
             // insert into mongo database
             const db = MongoUtil.getDB();
 
@@ -252,15 +243,14 @@ async function main() {
                 date: new Date(),
                 description,
                 body_tags,
-                ingredients : {
-                    quantity: ""
-                },
-                difficulty,
+                ingredients,
+                // difficulty,
                 duration,
                 instructions,
                 skin_concern,
 
             });
+
             res.status(200);
             res.json({
                 'message': 'Thank you for your submission!'
@@ -376,29 +366,47 @@ async function main() {
 
     app.post('/article/:id/comments/create', async (req, res) => {
         try {
-            let db = MongoUtil.getDB()
+            const db = MongoUtil.getDB();
 
-            let {
-                username,
-                email,
-                text,
-            } = req.body
+            let username= req.body.username;
+            let email= req.body.email;
+            let text= req.body.text;
 
-            let results = await db.collection(COLLECTION_ARTICLES).updateOne({
-                '_id': ObjectId(req.params.id)
-            }, {
-                '$push': {
-                    'comments': {
-                        username,
-                        email,
-                        text,
-                        comment_date: new Date(),
+            let commentInfo = 0;
+
+            if (username.length < 3) {
+                commentInfo += 1
+            }
+            if (!email.includes('@')) {
+                commentInfo += 1
+            }
+
+            if (text.length < 1) {
+                commentInfo += 1
+            }
+            console.log(commentInfo)
+            if (commentInfo > 0) {
+                return res.status(406).json({
+                    'message': 'invalid comments'
+                })
+            } else {
+                await db.collection(COLLECTION_ARTICLES).updateOne({
+                    '_id': ObjectId(req.params.id)
+                }, {
+                    '$push': {
+                        'comments': {
+                            username,
+                            email,
+                            text,
+                            comment_date: new Date(),
+                        }
                     }
-                }
-            })
-            res.statusCode = 200
-            res.send(results)
-
+                })
+                res.status(200)
+                res.json({
+                    'message':'succesful'
+                })
+            }
         } catch (e) {
             res.statusCode = 500
             res.send({
@@ -406,7 +414,6 @@ async function main() {
             });
             console.log(e)
         }
-
     })
 
     // PUT - COMMENTS 

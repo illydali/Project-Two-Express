@@ -47,70 +47,114 @@ const { ObjectId } = require("mongodb")
     }
 ]
 
+// {
+//     "title": "Yogurt facial mask",
+//     "image" : "",
+//     "date": yyyy-mm-dd,
+//     "body_tags": ["face neck"],
+//     "ingredients": [
+//         {
+//             "name": "Plain yogurt",
+//             "quantity" : "1 tsp"
+//         },
+//         {
+//             "name": "Orange",
+//             "quantity" : "Juice from 1/4 slice"
+//         },
+//         {
+//           "name": "Aloe",
+//           "quantity" : "1 tsp"
+//         }
+//     ],
+//     "duration" : 20, 
+//     "instructions": ["Mix all ingredients together,Apply to freshly cleansed skin in an even layer,Leave the mask on for 20 minutes,Rinse with warm water and pat dry"]
+//     "skin_concern" : "oily"
+// }
 
-"ingredients" = [
-    {
-        "_id": ObjectId,
-        "name" : "coconut oil",
-        "benefit" : "antibacterial and antifungal properties",
-    },
-    {
-        "_id": ObjectId,
-        "name": "honey",
-        "benefit" : "helps to deeply penetrate the skin, soften the skin layers and work to remove impurities from pores including dirt that causes blackheads",
-    },
-    {
-        "_id": ObjectId,
-        "name": "tumeric",
-        "benefit" : "",
-    },
-    {
-        "_id": ObjectId,
-        "name" : "egg whites",
-        "benefit" : "natural antibacterial that helps prevents clogged pores",
-    },
-    {
-        "_id": ObjectId,
-        "name" : "lemon",
-        "benefit" : "",
-    },
-    {
-        "_id": ObjectId,
-        "name" : "avocado",
-        "benefit" : "",
-    },
-    {
-        "_id": ObjectId,
-        "name" : "baking soda",
-        "benefit" : 'a natural, gentle abrasive that exfoliates your skin while absorbing excess oil and impurities that are buried'
+// "ingredients" = [
+//     {
+//         "_id": ObjectId,
+//         "name" : "coconut oil",
+//         "benefit" : "antibacterial and antifungal properties",
+//     },
+//     {
+//         "_id": ObjectId,
+//         "name": "honey",
+//         "benefit" : "helps to deeply penetrate the skin, soften the skin layers and work to remove impurities from pores including dirt that causes blackheads",
+//     },
+//     {
+//         "_id": ObjectId,
+//         "name": "tumeric",
+//         "benefit" : "",
+//     },
+//     {
+//         "_id": ObjectId,
+//         "name" : "egg whites",
+//         "benefit" : "natural antibacterial that helps prevents clogged pores",
+//     },
+//     {
+//         "_id": ObjectId,
+//         "name" : "lemon",
+//         "benefit" : "",
+//     },
+//     {
+//         "_id": ObjectId,
+//         "name" : "avocado",
+//         "benefit" : "",
+//     },
+//     {
+//         "_id": ObjectId,
+//         "name" : "baking soda",
+//         "benefit" : 'a natural, gentle abrasive that exfoliates your skin while absorbing excess oil and impurities that are buried'
 
 
-    }
-]
+//     }
+// ]
 
-"skin_concern" = [
-    {   
-        "_id": "62396886a2fdf6b678f3ddcb",
-        "type" : "dry",
-        "article_id" : [ObjectId, ObjectId]
-    },
-    {
-        "_id": ObjectId,
-        "type" : "oily",
-        "article_id" : ObjectId,
-    },
-    {
-        "_id": ObjectId,
-        "type" : "sensitive",
-        "article_id" : ObjectId
-    },
-    {
-        "_id": ObjectId,
-        "type" : "acne",
-        "article_id" : ObjectId
-    }
-]
-
+// "skin_concern" = [
+//     {   
+//         "_id": "62396886a2fdf6b678f3ddcb",
+//         "type" : "dry",
+//         "article_id" : [ObjectId, ObjectId]
+//     },
+//     {
+//         "_id": ObjectId,
+//         "type" : "oily",
+//         "article_id" : ObjectId,
+//     },
+//     {
+//         "_id": ObjectId,
+//         "type" : "sensitive",
+//         "article_id" : ObjectId
+//     },
+//     {
+//         "_id": ObjectId,
+//         "type" : "acne",
+//         "article_id" : ObjectId
+//     }
+// ]
+// {
+//     "title" : "Yogurt facial mask",
+//     "image" : "",
+//     "date": "yyyy-dd-mm",
+//     "body_tags": ["face, neck"],
+//     "description" : "Cleanse you skin and tighten your pores",
+//     "ingredients" : [ 
+//       {
+//       "name": "Plain yogurt",
+//       "quantity": "1 tsp"
+//     },{
+//       "name": "Orange",
+//       "quantity" : "Juice from 1/4 slice"
+//     },{
+//       "name": "Aloe",
+//       "quantity" : "1 tsp"
+//     }
+//     ],
+//     "duration" : 20,
+//     "instructions" : ["Mix all ingredients together,Apply to freshly cleansed skin in an even layer,Leave the mask on for 20 minutes,Rinse with warm water and pat dry"],
+//     "skin_concern" : "oily"
+//   }
 // ----------------------------------------- //
 
 // POST - add a new article 
