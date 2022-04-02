@@ -177,12 +177,70 @@ async function main() {
             let image = req.body.image;
 
             let description = req.body.description;
-            let body_tags = req.body.body_tags.split(","); // tags shld be inserted as string separated by comma
-            let ingredients = req.body.ingredients;
-            let difficulty = req.body.difficulty;
+            let body_tags = req.body.body_tags // tags shld be inserted as string separated by comma
+            let ingredients = req.body.ingredients // need to split
+            let quantity = req.body.ingredients.quantity;
+           
             let duration = req.body.duration;
             let instructions = req.body.instructions
             let skin_concern = req.body.skin_concern
+
+            // form validation
+
+            let testInfo = 0;
+
+            if (title.length < 4) {
+                testInfo += 1;
+            }
+            if (!image) {
+                testInfo += 1;
+            }
+
+            if (description.length < 5) {
+                testInfo += 1;
+            }
+
+            if (body_tags < 4) {
+                testInfo += 1;
+            }
+
+            if (!ingredients) {
+                testInfo += 1;
+            }
+
+            if (quantity.length < 3) {
+                testInfo += 1;
+            }
+
+            if (!duration) {
+                testInfo += 1;
+            }
+            
+            if (instructions.length < 4) {
+                testInfo += 1;
+            }
+
+            if (!skin_concern) {
+                testInfo += 1
+            } 
+
+            if (testInfo > 0) {
+                res.status(406)
+                res.json({
+                    'message' : 'Incomplete form'
+                })
+            } else {
+                body_tags = body_tags.split(",")
+                body_tags = body_tags.map(each => {
+                    return each.body_tags.trim()
+                })
+                ingredients = ingredients.split(",")
+                ingredients = ingredients.map(each => {
+                    return each.ingredients.trim()
+                })
+
+            }
+
 
             // insert into mongo database
             const db = MongoUtil.getDB();
@@ -194,7 +252,9 @@ async function main() {
                 date: new Date(),
                 description,
                 body_tags,
-                ingredients,
+                ingredients : {
+                    quantity: ""
+                },
                 difficulty,
                 duration,
                 instructions,
