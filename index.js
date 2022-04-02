@@ -342,7 +342,7 @@ async function main() {
     app.get('/article/:id/comments', async (req, res) => {
 
         try {
-            let db = MongoUtil.getDB();
+            const db = MongoUtil.getDB();
             let results = await db.collection(COLLECTION_ARTICLES).find({
                 "_id": ObjectId(req.params.id)
             }).project({
@@ -368,9 +368,9 @@ async function main() {
         try {
             const db = MongoUtil.getDB();
 
-            let username= req.body.username;
-            let email= req.body.email;
-            let text= req.body.text;
+            let username = req.body.username;
+            let email = req.body.email;
+            let text = req.body.text;
 
             let commentInfo = 0;
 
@@ -404,7 +404,7 @@ async function main() {
                 })
                 res.status(200)
                 res.json({
-                    'message':'succesful'
+                    'message': 'succesful'
                 })
             }
         } catch (e) {
@@ -423,25 +423,46 @@ async function main() {
     app.put('/article/:id/comments/edit/:username', async (req, res) => {
 
         try {
-            let db = MongoUtil.getDB()
+            const db = MongoUtil.getDB();
 
             let {
+                username,
+                email,
                 text,
             } = req.body
 
-            let results = await db.collection(COLLECTION_ARTICLES).updateOne({
-                'comments': {
-                    '$elemMatch': {
-                        'username': req.params.username
+            if (text.length < 5) {
+                return res.status(406).json({
+                    'message' : 'Please edit your comment, otherwise delete the comment'
+                })
+            }
+            let checkEmail = await db.collection(COLLECTION_ARTICLES).findOne({
+                "comments": {
+                    "$elemMatch": {
+                        'username': req.params.username,
+                        'email': email
                     }
                 }
-            }, {
-                '$set': {
-                    'comments.$.text': text,
-                    'comments.$.comment_date': new Date(),
-                }
             })
-
+            if (!checkEmail) {
+                return res.status(406).json({
+                    'message': 'invalid email'
+                })
+            } else {
+                await db.collection(COLLECTION_ARTICLES).updateOne({
+                    'comments': {
+                        '$elemMatch': {
+                            'username': req.params.username
+                        }
+                    }
+                }, {
+                    '$set': {
+                        'comments.$.username' : username,
+                        'comments.$.text': text,
+                        'comments.$.comment_date': new Date(),
+                    }
+                })
+            }
             res.statusCode = 200
             res.send({
                 'message': 'Comments Updated'
@@ -463,12 +484,26 @@ async function main() {
 
     app.delete('/article/:id/comments/:username', async (req, res) => {
         try {
-            let db = MongoUtil.getDB();
-
+            const db = MongoUtil.getDB();
+            let {id, username, email} = req.body
             // find article that has the comment to be deleted
+
+            // validate if username and email exists before allowing delete 
             let toDelete = await db.collection(COLLECTION_ARTICLES).findOne({
                 '_id': ObjectId(req.params.id),
+                "comments": {
+                    "$elemMatch": {
+                        'username': req.params.username,
+                        'email': email
+                    }
+                }
             })
+
+            if (!toDelete) {
+                return res.status(406).json({
+                    'message': 'user does not exist'
+                })
+            }
 
             if (toDelete) {
                 let clone = []
