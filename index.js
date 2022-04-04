@@ -175,7 +175,7 @@ async function main() {
 
             let title = req.body.title;
             let image = req.body.image;
-
+            let email = req.body.email;
             let description = req.body.description;
             let body_tags = req.body.body_tags // tags shld be inserted as string separated by comma
             let ingredients = req.body.ingredients // need to split
@@ -229,7 +229,7 @@ async function main() {
                 ingredients = ingredients.map((each) => {
                     return {
                         name: each.name,
-                        quantity: each.quantity
+                        quantity: each.quantity || ""
                     }
                 })
             }
@@ -244,6 +244,7 @@ async function main() {
                 description,
                 body_tags,
                 ingredients,
+                email,
                 // difficulty,
                 duration,
                 instructions,
