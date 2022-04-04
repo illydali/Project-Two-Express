@@ -81,6 +81,25 @@ async function main() {
 
     })
 
+    // GET - by one id
+
+    app.get('/article/:id', async function (req, res) {
+        try {
+            const db = MongoUtil.getDB()
+            let result = await db.collection(COLLECTION_ARTICLES).find({
+                '_id': ObjectId(req.params.id)
+            }).toArray();
+
+            res.status(200);
+            res.send(result);
+        } catch (e) {
+            res.status(500);
+            res.send({
+                "message": "invalid"
+            })
+        }
+    })
+
     // GET - search filter using criteria honey & face (checked)
     // route as follows: /articles/search?title=honey&body_tags=face
 
@@ -191,9 +210,11 @@ async function main() {
             if (title.length < 4) {
                 testInfo += 1;
             }
+            console.log(title)
             if (!image) {
                 testInfo += 1;
             }
+            console.log(image)
             if (description.length < 5) {
                 testInfo += 1;
             }
@@ -203,15 +224,18 @@ async function main() {
             if (!ingredients) {
                 testInfo += 1;
             }
+            console.log(ingredients)
             if (!duration) {
                 testInfo += 1;
             }
             if (!instructions) {
                 testInfo += 1;
             }
+            console.log(instructions)
             if (!skin_concern) {
                 testInfo += 1
             }
+            console.log(testInfo)
             if (testInfo > 0) {
                 return res.status(406).json({
                     'message': 'incomplete'
@@ -228,7 +252,7 @@ async function main() {
                 })
                 ingredients = ingredients.map((each) => {
                     return {
-                        name: each.name,
+                        name: each.name || "",
                         quantity: each.quantity || ""
                     }
                 })
