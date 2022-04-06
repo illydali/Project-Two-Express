@@ -218,9 +218,11 @@ async function main() {
             if (description.length < 5) {
                 testInfo += 1;
             }
+            console.log(description)
             if (!body_tags) {
                 testInfo += 1;
             }
+            console.log(body_tags)
             if (!ingredients) {
                 testInfo += 1;
             }
@@ -228,34 +230,35 @@ async function main() {
             if (!duration) {
                 testInfo += 1;
             }
+            console.log(duration)
             if (!instructions) {
                 testInfo += 1;
             }
             console.log(instructions)
-            if (!skin_concern) {
-                testInfo += 1
-            }
+            // if (!skin_concern) {
+            //     testInfo += 1
+            // }
+            // console.log(skin_concern)
             console.log(testInfo)
             if (testInfo > 0) {
                 return res.status(406).json({
                     'message': 'incomplete'
                 })
             } else {
-                body_tags = body_tags.split(",")
+                body_tags = body_tags.split(',')
                 // console.log(typeof body_tags)
                 body_tags = body_tags.map(each => {
                     return each.trim()
                 })
-                instructions = instructions.split(",")
+                instructions = instructions.split(',')
                 instructions = instructions.map(each => {
                     return each.trim()
                 })
-                ingredients = ingredients.map((each) => {
-                    return {
-                        name: each.name || "",
-                        quantity: each.quantity || ""
-                    }
+                ingredients = ingredients.split(',')
+                ingredients = ingredients.map(each => {
+                    return each.trim()
                 })
+                console.log(ingredients)
             }
             // insert into mongo database
             const db = MongoUtil.getDB();
@@ -297,14 +300,16 @@ async function main() {
     app.put('/article/:id', async (req, res) => {
 
         try {
+
+
             let title = req.body.title;
-            // let image = req.body.image;
-            // let date = new Date(req.body.date)
+            let image = req.body.image;
+            let date = new Date(req.body.date)
             // let body_tags = req.body.body_tags
             // let ingredients = req.body.ingredients;
-            // let difficulty = req.body.difficulty;
-            // let duration = req.body.duration;
-            // let instructions = req.body.instructions
+            let description = req.body.description;
+            let duration = req.body.duration;
+            let instructions = req.body.instructions
             // let skin_concern = req.body.skin_concern
 
             // body_tags = body_tags.split(",")
@@ -315,13 +320,14 @@ async function main() {
             }, {
                 '$set': {
                     'title': title,
-                    // 'image': image,
-                    // 'date': date,
+                    'image': image,
+                    'date': date,
+                    'description': description,
                     // 'body_tags': body_tags,
                     // 'ingredients': ingredients,
                     // 'difficulty': difficulty,
-                    // 'duration': duration,
-                    // 'instructions': instructions,
+                    'duration': duration,
+                    'instructions': instructions,
                     // 'skin_concern': skin_concern,
                 }
             });
@@ -334,7 +340,7 @@ async function main() {
             res.json({
                 'message': "Please come back later"
             })
-            console.log(e) // to check the actual error message
+            // console.log(e) // to check the actual error message
         }
     })
 
@@ -355,7 +361,7 @@ async function main() {
             res.json({
                 'message': "Unable to delete documents"
             })
-            console.log(e) // to check the actual error message
+            // console.log(e) // to check the actual error message
         }
 
     })
