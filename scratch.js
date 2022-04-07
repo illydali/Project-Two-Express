@@ -1,6 +1,5 @@
 const { ObjectID } = require("bson")
 const { ObjectId } = require("mongodb")
-
 // sample document
 "beautyhacks" = [
     {

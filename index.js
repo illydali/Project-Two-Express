@@ -282,6 +282,7 @@ async function main() {
             res.status(200);
             res.json({
                 'message': 'Thank you for your submission!'
+
             })
         } catch (e) {
             res.status(500);
@@ -335,6 +336,7 @@ async function main() {
             res.json({
                 'message': 'Success'
             })
+
         } catch (e) {
             res.status(500);
             res.json({
@@ -430,6 +432,7 @@ async function main() {
                             email,
                             text,
                             comment_date: new Date(),
+                            _id: new ObjectId
                         }
                     }
                 })
@@ -451,7 +454,7 @@ async function main() {
     // user can edit comment
     // tested on API
 
-    app.put('/article/:id/comments/edit/:username', async (req, res) => {
+    app.put('/article/:id/comments/:comment_id', async (req, res) => {
 
         try {
             const db = MongoUtil.getDB();
@@ -462,47 +465,28 @@ async function main() {
                 text,
             } = req.body
 
-            if (text.length < 5) {
-                return res.status(406).json({
-                    'message' : 'Please edit your comment, otherwise delete the comment'
-                })
-            }
-            let checkEmail = await db.collection(COLLECTION_ARTICLES).findOne({
-                "comments": {
-                    "$elemMatch": {
-                        'username': req.params.username,
-                        'email': email
+            let results = await db.collection(COLLECTION_ARTICLES).updateOne({
+                'comments': {
+                    '$elemMatch': {
+                        '_id': ObjectId(req.params.comment_id)
                     }
                 }
+            }, {
+                '$set': {
+                    'comments.$.username': username,
+                    'comments.$.text': text,
+                    'comments.$.date': new Date(),
+                }
             })
-            if (!checkEmail) {
-                return res.status(406).json({
-                    'message': 'invalid email'
-                })
-            } else {
-                await db.collection(COLLECTION_ARTICLES).updateOne({
-                    'comments': {
-                        '$elemMatch': {
-                            'username': req.params.username
-                        }
-                    }
-                }, {
-                    '$set': {
-                        'comments.$.username' : username,
-                        'comments.$.text': text,
-                        'comments.$.comment_date': new Date(),
-                    }
-                })
-            }
-            res.statusCode = 200
-            res.send({
-                'message': 'Comments Updated'
-            })
+
+            res.status(200);
+            res.send(results)
+
 
         } catch (e) {
 
             res.statusCode = 500
-            res.send({
+            res.json({
                 "Message": "Unable to update comment"
             });
             console.log(e)
@@ -513,53 +497,30 @@ async function main() {
     // user can choose to delete a comment
     // tested on API
 
-    app.delete('/article/:id/comments/:username', async (req, res) => {
+    app.delete('/article/:id/comments/:comment_id', async (req, res) => {
         try {
             const db = MongoUtil.getDB();
-            let {id, username, email} = req.body
-            // find article that has the comment to be deleted
 
-            // validate if username and email exists before allowing delete 
-            let toDelete = await db.collection(COLLECTION_ARTICLES).findOne({
+            // find article that has the comment to be deleted
+            let article = await db.collection(COLLECTION_ARTICLES).findOne({
                 '_id': ObjectId(req.params.id),
-                "comments": {
-                    "$elemMatch": {
-                        'username': req.params.username,
-                        'email': email
-                    }
-                }
             })
 
-            if (!toDelete) {
-                return res.status(406).json({
-                    'message': 'user does not exist'
-                })
-            }
-
-            if (toDelete) {
-                let clone = []
-                if (toDelete.comments.length > 1) {
-                    let oldComment = toDelete.comments;
-                    let indexToDelete = oldComment.findIndex((c) => {
-                        return c.username == req.params.username;
-                    });
-
-                    clone = [
-                        ...oldComment.slice(0, indexToDelete),
-                        ...oldComment.slice(indexToDelete + 1)
-                    ];
-                }
-
-                let results = await db.collection(COLLECTION_ARTICLES).updateOne({
+            if (article) {
+                await db.collection(COLLECTION_ARTICLES).updateOne({
                     '_id': ObjectId(req.params.id)
                 }, {
-                    $set: {
-                        "comments": clone
+                    $pull: {
+                        'comments': {
+                            '_id': ObjectId(req.params.comment_id)
+                        }
                     }
                 })
-
-                res.statusCode = 200
-                res.send(results)
+                res.status(200)
+                console.log("comment deleted")
+                res.json({
+                    'message': 'comment deleted successfully'
+                })
             }
         } catch (e) {
             res.statusCode = 500
