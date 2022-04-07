@@ -210,15 +210,12 @@ async function main() {
             if (title.length < 4) {
                 testInfo += 1;
             }
-            console.log(title)
             if (!image) {
                 testInfo += 1;
             }
-            console.log(image)
             if (description.length < 5) {
                 testInfo += 1;
             }
-            console.log(description)
             if (!body_tags) {
                 testInfo += 1;
             }
@@ -313,16 +310,13 @@ async function main() {
             let instructions = req.body.instructions
             // let skin_concern = req.body.skin_concern
 
-            // body_tags = body_tags.split(",")
-            // date = new Date(date);
-
             let results = await MongoUtil.getDB().collection(COLLECTION_ARTICLES).updateOne({
                 '_id': ObjectId(req.params.id)
             }, {
                 '$set': {
                     'title': title,
                     'image': image,
-                    'date': date,
+                    'date': new Date(),
                     'description': description,
                     // 'body_tags': body_tags,
                     // 'ingredients': ingredients,
@@ -342,7 +336,6 @@ async function main() {
             res.json({
                 'message': "Please come back later"
             })
-            // console.log(e) // to check the actual error message
         }
     })
 
