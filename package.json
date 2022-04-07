@@ -12,5 +12,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
-  }
+  },
+  "name": "project-two-express",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/illydali/Project-Two-Express.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/illydali/Project-Two-Express/issues"
+  },
+  "homepage": "https://github.com/illydali/Project-Two-Express#readme",
+  "description": ""
 }
