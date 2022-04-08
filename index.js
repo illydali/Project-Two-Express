@@ -10,7 +10,12 @@ app.use(cors());
 
 const COLLECTION_ARTICLES = "beautyhacks"
 const COLLECTION_INGREDIENTS = "ingredients"
-const COLLECTION_SKIN = 'skin_concern'
+
+
+function makeArray(obj) {
+    let newArr = obj || []; // if null, set as empty list
+    return Array.isArray(newArr) ? newArr : [newArr]; // if at least 1 element, make it into array
+}
 
 async function main() {
     await MongoUtil.connect(process.env.MONGO_URI, "test_homemade");
@@ -41,25 +46,7 @@ async function main() {
         }
     })
 
-    // skin_concern collection here -- TBC if needed later
-    app.get('/skin', async function (req, res) {
-        try {
-            const db = MongoUtil.getDB()
 
-            let allTypes = await db.collection(COLLECTION_SKIN).find().toArray();
-
-
-            res.json({
-                'skin_types': allTypes
-            })
-        } catch (e) {
-            res.status(500);
-            res.json({
-                'message': 'Confirm something wrong here'
-            })
-            console.log(e)
-        }
-    })
     // GET - view all articles in collection (checked)
     // tested on API
 
@@ -138,6 +125,14 @@ async function main() {
                 }
             }
 
+            let skin = makeArray(req.query.skin_concern)
+            if (req.query.skin_concern) {
+                criteria['skin_concern'] = {
+                    '$in' : skin
+                }
+            }
+            
+
             // selecting by duration
             if (req.query.duration) {
                 if (req.query.duration == '10mins or less') {
@@ -158,6 +153,7 @@ async function main() {
                 }
             }
 
+            console.log(criteria)
             const db = MongoUtil.getDB();
             // when using .find() needs a toArray()
             // when using .findOne(), not required
@@ -172,6 +168,7 @@ async function main() {
                 )
             }
             console.log(criteria)
+            console.log(req.query.skin_concern)
 
             res.send(results)
             res.status(200)
