@@ -23,7 +23,7 @@ async function main() {
     // GET - welcome message
     app.get('/', function (req, res) {
         res.send(
-           ` <h1>Welcome to the Skin Lang. API!</h1>`
+            ` <h1>Welcome to the Skin Lang. API!</h1>`
         )
     })
 
@@ -128,10 +128,10 @@ async function main() {
             let skin = makeArray(req.query.skin_concern)
             if (req.query.skin_concern) {
                 criteria['skin_concern'] = {
-                    '$in' : skin
+                    '$in': skin
                 }
             }
-            
+
 
             // selecting by duration
             if (req.query.duration) {
@@ -193,15 +193,15 @@ async function main() {
             let image = req.body.image;
             let email = req.body.email;
             let description = req.body.description;
-            let body_tags = req.body.body_tags 
+            let body_tags = req.body.body_tags
             let ingredients = req.body.ingredients
             let duration = parseInt(req.body.duration);
             let instructions = req.body.instructions
             let skin_concern = req.body.skin_concern
 
-            
+
             // form validation
-            
+
             let testInfo = 0;
 
             if (title.length < 4) {
@@ -302,7 +302,12 @@ async function main() {
             let description = req.body.description;
             let duration = parseInt(req.body.duration);
             let instructions = req.body.instructions
-            
+
+            instructions = instructions.split(',')
+            instructions = instructions.map(each => {
+                return each.trim()
+            })
+            console.log(instructions)
 
             let results = await MongoUtil.getDB().collection(COLLECTION_ARTICLES).updateOne({
                 '_id': ObjectId(req.params.id)
@@ -312,11 +317,9 @@ async function main() {
                     'image': image,
                     'date': new Date(),
                     'description': description,
-                    // 'body_tags': body_tags,
-                    // 'ingredients': ingredients,
                     'duration': duration,
                     'instructions': instructions,
-                    'skin_concern': skin_concern,
+
                 }
             });
             res.status(200);
