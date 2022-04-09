@@ -21,10 +21,10 @@ async function main() {
     await MongoUtil.connect(process.env.MONGO_URI, "test_homemade");
 
     // GET - welcome message
-    app.get('/welcome', function (req, res) {
-        res.json({
-            'message': 'Welcome to the Skin Lang. API!'
-        })
+    app.get('/', function (req, res) {
+        res.send(
+           ` <h1>'Welcome to the Skin Lang. API!'</h1>`
+        )
     })
 
     app.get('/ingredients', async function (req, res) {
@@ -193,15 +193,15 @@ async function main() {
             let image = req.body.image;
             let email = req.body.email;
             let description = req.body.description;
-            let body_tags = req.body.body_tags // tags shld be inserted as string separated by comma
-            let ingredients = req.body.ingredients // need to split
-
-            let duration = req.body.duration;
+            let body_tags = req.body.body_tags 
+            let ingredients = req.body.ingredients
+            let duration = parseInt(req.body.duration);
             let instructions = req.body.instructions
             let skin_concern = req.body.skin_concern
 
+            
             // form validation
-
+            
             let testInfo = 0;
 
             if (title.length < 4) {
@@ -224,16 +224,16 @@ async function main() {
             if (!duration) {
                 testInfo += 1;
             }
-            console.log(duration)
+            console.log('time = ' + duration)
             if (!instructions) {
                 testInfo += 1;
             }
             console.log(instructions)
-            // if (!skin_concern) {
-            //     testInfo += 1
-            // }
-            // console.log(skin_concern)
-            console.log(testInfo)
+            if (!skin_concern) {
+                testInfo += 1
+            }
+            console.log(`skin_concern =` + skin_concern)
+            console.log('testinfo' + testInfo)
             if (testInfo > 0) {
                 return res.status(406).json({
                     'message': 'incomplete'
@@ -266,7 +266,6 @@ async function main() {
                 body_tags,
                 ingredients,
                 email,
-                // difficulty,
                 duration,
                 instructions,
                 skin_concern,
@@ -300,12 +299,10 @@ async function main() {
             let title = req.body.title;
             let image = req.body.image;
             let date = new Date(req.body.date)
-            // let body_tags = req.body.body_tags
-            // let ingredients = req.body.ingredients;
             let description = req.body.description;
-            let duration = req.body.duration;
+            let duration = parseInt(req.body.duration);
             let instructions = req.body.instructions
-            // let skin_concern = req.body.skin_concern
+            
 
             let results = await MongoUtil.getDB().collection(COLLECTION_ARTICLES).updateOne({
                 '_id': ObjectId(req.params.id)
@@ -317,10 +314,9 @@ async function main() {
                     'description': description,
                     // 'body_tags': body_tags,
                     // 'ingredients': ingredients,
-                    // 'difficulty': difficulty,
                     'duration': duration,
                     'instructions': instructions,
-                    // 'skin_concern': skin_concern,
+                    'skin_concern': skin_concern,
                 }
             });
             res.status(200);
