@@ -23,7 +23,7 @@ async function main() {
     // GET - welcome message
     app.get('/', function (req, res) {
         res.send(
-           ` <h1>'Welcome to the Skin Lang. API!'</h1>`
+           ` <h1>Welcome to the Skin Lang. API!</h1>`
         )
     })
 
@@ -291,7 +291,7 @@ async function main() {
 
     // tested on API : update title 
     // TBC what else user is gonna be allowed to update
-    app.put('/article/:id', async (req, res) => {
+    app.patch('/article/:id', async (req, res) => {
 
         try {
 
