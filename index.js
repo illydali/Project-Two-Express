@@ -420,7 +420,7 @@ async function main() {
                             username,
                             email,
                             text,
-                            comment_date: new Date(),
+                            date: new Date(),
                             _id: new ObjectId
                         }
                     }
@@ -465,6 +465,7 @@ async function main() {
                     'comments.$.username': username,
                     'comments.$.text': text,
                     'comments.$.date': new Date(),
+                    'comments.$.email': email
                 }
             })
 

@@ -2,7 +2,9 @@
 
 A backend API built using NodeJS Express and MongoDb to connect to front-end that is built using React. 
 
-Deployed API link can be found at : https://beauty-from-home.herokuapp.com
+Deployed API link: https://beauty-from-home.herokuapp.com
+
+Frontend repository: https://github.com/illydali/Project-Two-FrontEnd-React
 
 Upon successful connection, the following message will be displayed. 
 
