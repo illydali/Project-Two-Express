@@ -221,7 +221,7 @@ async function main() {
                 testInfo += 1;
             }
             console.log(ingredients)
-            if (!duration) {
+            if (!duration || duration < 0) {
                 testInfo += 1;
             }
             console.log('time = ' + duration)
@@ -292,10 +292,8 @@ async function main() {
     // tested on API : update title 
     // TBC what else user is gonna be allowed to update
     app.patch('/article/:id', async (req, res) => {
-
+        console.log(req.body)
         try {
-
-
             let title = req.body.title;
             let image = req.body.image;
             let date = new Date(req.body.date)
@@ -303,13 +301,15 @@ async function main() {
             let duration = parseInt(req.body.duration);
             let instructions = req.body.instructions
 
-            instructions = instructions.split(',')
-            instructions = instructions.map(each => {
-                return each.trim()
-            })
-            console.log(instructions)
+            // instructions = instructions.split(',')
+            // instructions = instructions.map(each => {
+            //     return each.trim()
+            // })
+            // console.log(instructions)
 
-            let results = await MongoUtil.getDB().collection(COLLECTION_ARTICLES).updateOne({
+            const db = MongoUtil.getDB();
+
+            let results = await db.collection(COLLECTION_ARTICLES).updateOne({
                 '_id': ObjectId(req.params.id)
             }, {
                 '$set': {
@@ -322,16 +322,17 @@ async function main() {
 
                 }
             });
+            console.log(results)
             res.status(200);
-            res.json({
-                'message': 'Success'
-            })
+            res.send(results)
+
 
         } catch (e) {
             res.status(500);
             res.json({
                 'message': "Please come back later"
             })
+            console.log(e) // to check the actual error message
         }
     })
 
@@ -352,7 +353,7 @@ async function main() {
             res.json({
                 'message': "Unable to delete documents"
             })
-            // console.log(e) // to check the actual error message
+            console.log(e) // to check the actual error message
         }
 
     })
